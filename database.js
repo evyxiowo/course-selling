@@ -1,5 +1,4 @@
 const {Schema, default: mongoose } = require('mongoose');
-mongoose.connect('mongodb+srv://evy:7830023044@evyyx.sqlg1.mongodb.net/course-seller-db?retryWrites=true&w=majority');
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 

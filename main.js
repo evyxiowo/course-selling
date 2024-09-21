@@ -15,7 +15,13 @@ app.use("api/v1/course", courseRouter);
 app.use("api/v1/admin", require("./routes/admin")["adminRouter"])
 
 
+async function main() {
 
-app.listen(port, () => {
-   console.log( `Server is running on port ${port}`);
-   })
+    //store database connection in dotenv file
+    await mongoose.connect('mongodb+srv://evy:7830023044@evyyx.sqlg1.mongodb.net/course-seller-db?retryWrites=true&w=majority')
+    app.listen(port, () => {
+        console.log( `Server is running on port ${port}`);
+        })
+    }
+    
+main();
