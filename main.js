@@ -7,12 +7,12 @@ const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
-app.use(express.cookieParser());
-app.use(express.session({ secret: 'your-secret-key' }));
-app.use("/user", userRouter);
-app.use("/course", courseRouter);
 
+
+
+app.use("/api/v1/user", userRouter);
+app.use("api/v1/course", courseRouter);
+app.use("api/v1/admin", require("./routes/admin")["adminRouter"])
 
 
 
