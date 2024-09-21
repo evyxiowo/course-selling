@@ -1,19 +1,20 @@
 const express = require('express');
+const {userRouter} = require("./routes/user")
+const {courseRouter} = require("./routes/course")
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(express.cookieParser());
+app.use(express.session({ secret: 'your-secret-key' }));
+app.use("/user", userRouter);
+app.use("/course", courseRouter);
 
-app.post('/user/signup', (req, res) => {});
 
-app.post('user/signin', (req, res) => {});
 
-app.post('/user/purchases', (req, res) => {});
-
-app.post('/user/:userId', (req, res) => {});
-
-app.post('/user/:userId/posts', (req, res) => {});
 
 app.listen(port, () => {
    console.log( `Server is running on port ${port}`);
