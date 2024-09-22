@@ -1,27 +1,37 @@
 const express = require('express');
-const {userRouter} = require("./routes/user")
-const {courseRouter} = require("./routes/course")
-const { User } = require("./database.js")
-const app = express();
-const port = 3000;
+const mongoose = require('mongoose');
+const { userRouter } = require("./routes/user");
+const { courseRouter } = require("./routes/course");
+const { adminRouter } = require("./routes/admin");
+require('dotenv').config();  // Load environment variables from .env
 
+const app = express();
+const port = process.env.PORT || 3000;  // Use port from .env, default to 3000 if not set
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
+// Routes
 app.use("/api/v1/user", userRouter);
-app.use("api/v1/course", courseRouter);
-app.use("api/v1/admin", require("./routes/admin")["adminRouter"])
+app.use("/api/v1/course", courseRouter);
+app.use("/api/v1/admin", adminRouter);
 
-
+// Connect to MongoDB and start the server
 async function main() {
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+   
+        });
+        console.log("Connected to MongoDB");
 
-    //store database connection in dotenv file
-    await mongoose.connect('mongodb+srv://evy:7830023044@evyyx.sqlg1.mongodb.net/course-seller-db?retryWrites=true&w=majority')
-    app.listen(port, () => {
-        console.log( `Server is running on port ${port}`);
-        })
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    } catch (error) {
+        console.error("Error connecting to MongoDB:", error);
+        process.exit(1);  // Exit process with failure
     }
-    
+}
+
 main();
