@@ -21,4 +21,6 @@ async function authenticateAdmin(req, res, next) {
     });
 }
 
-module.exports = authenticateAdmin;
+module.exports = {
+    authenticateAdmin: authenticateAdmin
+}

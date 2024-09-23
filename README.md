@@ -1,1 +1,4 @@
 # course-selling
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjEwZGQ2NDMxMWMwMmFhZDNiMTYxMCIsImlhdCI6MTcyNzA3NDQ2MiwiZXhwIjoxNzI3MTYwODYyfQ.7FWMCq3rqS6_E-B-fsh7O4e2AIZTIZ2ErcHX4NSWFqg"
+}

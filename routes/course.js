@@ -1,73 +1,52 @@
-const { Router } = require('express');
-const { Course, Purchase, User } = require('../database.js');  // Import models
+const { Router } = require("express");
+const { z } = require("zod"); // Zod for validation
+const { authenticateUser } = require("../middleware/user");
+const { purchaseModel, courseModel } = require("../database");
+
 const courseRouter = Router();
 
-// POST /purchase - Make a course purchase
-courseRouter.post('/purchase', async (req, res) => {
-    const { userId, courseId } = req.body;
+// Zod schema for purchase validation
+const purchaseSchema = z.object({
+    courseId: z.string()
+});
 
+// Purchase a Course (User Only)
+courseRouter.post("/purchase", authenticateUser, async function(req, res) {
     try {
-        // Check if the user and course exist
-        const user = await User.findById(userId);
-        const course = await Course.findById(courseId);
-        
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        const userId = req.userId;
+        const { courseId } = purchaseSchema.parse(req.body);
+
+        // TODO: Add payment verification logic here (e.g., check if the user has paid)
+        const course = await courseModel.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        // Create a new purchase record
-        const newPurchase = new Purchase({
-            user: userId,
-            course: courseId,
-            purchaseDate: new Date(),
-            purchaseStatus: 'completed' // Default to completed for now
-        });
+        await purchaseModel.create({ user: userId, course: courseId });
 
-        // Save the purchase to the database
-        await newPurchase.save();
-
-        // Optionally, add the course to the user's enrolled courses
-        user.coursesEnrolled.push(courseId);
-        await user.save();
-
-        res.json({
-            message: 'Purchase successful',
-            courseId,
-            userId,
-            purchaseDate: newPurchase.purchaseDate,
-            status: newPurchase.purchaseStatus
+        res.status(201).json({
+            message: "You have successfully purchased the course"
         });
     } catch (error) {
-        res.status(500).json({ message: "Error making purchase", error });
+        res.status(400).json({
+            message: "Error purchasing the course",
+            error: error.message
+        });
     }
 });
 
-// GET /preview - Preview a course
-courseRouter.get('/preview', async (req, res) => {
-    const { courseId } = req.query;
-
+// Get Course Previews (Public)
+courseRouter.get("/preview", async function(req, res) {
     try {
-        // Fetch course details from the database
-        const course = await Course.findById(courseId);
-        if (!course) {
-            return res.status(404).json({ message: "Course not found" });
-        }
+        const courses = await courseModel.find({});
 
-        res.json({
-            courseId: course._id,
-            title: course.name,
-            description: course.description,
-            price: course.price,
-            image: course.courseImage
-        });
+        res.status(200).json({ courses });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching course preview", error });
+        res.status(500).json({
+            message: "Error fetching courses",
+            error: error.message
+        });
     }
 });
 
-module.exports = {
-    courseRouter
-};
+module.exports = { courseRouter };
