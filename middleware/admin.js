@@ -1,26 +1,32 @@
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config');
-const { Admin } = require('../database');
+const jwt = require("jsonwebtoken");
+const { JWT_ADMIN_PASSWORD } = require("../config");
 
-// Middleware to verify JWT for admins
-async function authenticateAdmin(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json({ message: "Access denied. No token provided." });
+function authenticateAdmin(req, res, next) {
+    const token = req.headers.token;
 
-    // Verify token
-    jwt.verify(token.split(' ')[1], JWT_SECRET, async (err, decoded) => {
-        if (err) return res.status(403).json({ message: "Invalid token" });
+    // Check if token is provided
+    if (!token) {
+        return res.status(401).json({
+            message: "Token is missing",
+        });
+    }
 
-        const admin = await Admin.findById(decoded.id);
-        if (!admin) {
-            return res.status(403).json({ message: "Access denied. Admins only." });
-        }
+    try {
+        // Verify the token
+        const decoded = jwt.verify(token, JWT_ADMIN_PASSWORD);
 
-        req.admin = admin; // Save the decoded admin data
-        next();
-    });
+        // Assign user ID to request object for further use
+        req.userId = decoded.id;
+        next(); // Proceed to the next middleware
+    } catch (error) {
+        // Handle any error that occurs during verification
+        return res.status(403).json({
+            message: "Invalid or expired token",
+            error: error.message, // Optionally log the error message for debugging
+        });
+    }
 }
 
 module.exports = {
-    authenticateAdmin: authenticateAdmin
-}
+    authenticateAdmin,
+};

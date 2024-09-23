@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { z } = require("zod");
 
 const adminRouter = Router();
-const { adminModel, courseModel } = require("../database");
+const { Admin, Course } = require("../database");
 const { JWT_ADMIN_PASSWORD } = require("../config");
 const { authenticateAdmin } = require("../middleware/admin");
 
@@ -33,19 +33,26 @@ const courseSchema = z.object({
 // Admin Signup
 adminRouter.post("/signup", async function(req, res) {
     try {
+        console.log("Admin signup request received");
+        
         const { email, password, firstName, lastName } = signupSchema.parse(req.body);
-
+        console.log("Parsed signup request: ", { email, password, firstName, lastName });
+        
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("Hashed password: ", hashedPassword);
+        
 
         // Create admin
-        const admin = await adminModel.create({
+        await Admin.create({
             email,
             password: hashedPassword,
             firstName,
             lastName,
-            role: 'admin'
+            role: "admin"
         });
+        
+        console.log("Admin created: ", admin);
 
         res.status(201).json({ message: "Signup succeeded", adminId: admin._id });
     } catch (error) {
@@ -58,7 +65,7 @@ adminRouter.post("/signin", async function(req, res) {
     try {
         const { email, password } = signinSchema.parse(req.body);
 
-        const admin = await adminModel.findOne({ email });
+        const admin = await Admin.findOne({ email });
 
         if (!admin) {
             return res.status(403).json({ message: "Incorrect credentials" });
@@ -83,10 +90,13 @@ adminRouter.post("/signin", async function(req, res) {
 adminRouter.post("/course", authenticateAdmin, async function(req, res) {
     try {
         const adminId = req.userId;
+        console.log("Admin creating course request received", adminId);
+        
 
         const { title, description, imageUrl, price } = courseSchema.parse(req.body);
-
-        const course = await courseModel.create({
+        console.log("Parsed course creation request: ", { title, description, imageUrl, price });
+        
+        const course = await Course.create({  
             title,
             description,
             imageUrl,
@@ -107,7 +117,7 @@ adminRouter.put("/course", authenticateAdmin, async function(req, res) {
 
         const { title, description, imageUrl, price, courseId } = courseSchema.extend({ courseId: z.string() }).parse(req.body);
 
-        const course = await courseModel.updateOne(
+        const course = await Course.updateOne(
             { _id: courseId, creatorId: adminId },
             { title, description, imageUrl, price }
         );
@@ -127,7 +137,7 @@ adminRouter.get("/course/bulk", authenticateAdmin, async function(req, res) {
     try {
         const adminId = req.userId;
 
-        const courses = await courseModel.find({ creatorId: adminId });
+        const courses = await Course.find({ creatorId: adminId });
 
         res.status(200).json({ message: "Courses retrieved", courses });
     } catch (error) {

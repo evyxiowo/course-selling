@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { z } = require("zod"); // Zod for validation
 const { authenticateUser } = require("../middleware/user");
-const { purchaseModel, courseModel } = require("../database");
+const { Purchase, Course } = require("../database");
 
 const courseRouter = Router();
 
@@ -17,12 +17,12 @@ courseRouter.post("/purchase", authenticateUser, async function(req, res) {
         const { courseId } = purchaseSchema.parse(req.body);
 
         // TODO: Add payment verification logic here (e.g., check if the user has paid)
-        const course = await courseModel.findById(courseId);
+        const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        await purchaseModel.create({ user: userId, course: courseId });
+        await Purchase.create({ user: userId, course: courseId });
 
         res.status(201).json({
             message: "You have successfully purchased the course"
@@ -38,7 +38,7 @@ courseRouter.post("/purchase", authenticateUser, async function(req, res) {
 // Get Course Previews (Public)
 courseRouter.get("/preview", async function(req, res) {
     try {
-        const courses = await courseModel.find({});
+        const courses = await Course.find({});
 
         res.status(200).json({ courses });
     } catch (error) {

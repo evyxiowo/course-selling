@@ -16,10 +16,11 @@ const userSchema = new Schema({
 
 
 const adminSchema =  new Schema({
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'admin'], default: 'admin' },
+    role: { type: String,  default: 'admin' },
     profileImage: { type: String },
     address: { type: String },
     contactNumber: { type: String },
@@ -27,16 +28,23 @@ const adminSchema =  new Schema({
 })
 
 const courseSchema =  new Schema({
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     description: { type: String, required: true },
+    imageUrl: { type: String, required: true },
     price: { type: Number, required: true },
-    instructor: { type: String, required: true },
-    duration: { type: Number, required: true },
-    courseCategory: { type: String, required: true },
-    courseImage: { type: String, required: true },
-    courseVideo: { type: String, required: true },
-    courseMaterial: [{ type: String }],
-    courseStudents: [{ type: ObjectId, ref: 'User' }]
+    creatorId: { type: ObjectId, ref: 'adminId' },
+    // name: { type: String, required: true },
+    // instructor: { type: String, required: true },
+    // duration: { type: Number, required: true },
+    // courseCategory: { type: String, required: true },
+    // courseImage: { type: String, required: true },
+    // courseVideo: { type: String, required: true },
+    // courseMaterial: [{ type: String }],
+    // courseStudents: [{ type: ObjectId, ref: 'User' }],
+    // courseReviews: [{ type: ObjectId, ref: 'Review' }],
+    // courseEnrollments: [{ type: ObjectId, ref: 'Enrollment' }]
+
+
  
 })
 

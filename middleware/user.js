@@ -9,7 +9,11 @@ function authenticateUser(req, res, next) {
     console.log("Request headers: ", req.headers);
 
     // Check for token in Authorization or token header
-    const token = req.headers['authorization']?.split(' ')[1] || req.headers.token;
+    const authHeader = req.headers['authorization'];
+    console.log("Authorization Header: ", authHeader);
+
+    // If the header starts with "Bearer", take the token part (after the space)
+    const token = authHeader?.split(' ')[1] || req.headers.token;
     console.log("Extracted Token: ", token);
 
     if (!token) {
@@ -33,5 +37,5 @@ function authenticateUser(req, res, next) {
 }
 
 module.exports = {
-    authenticateUser: authenticateUser,
+    authenticateUser,
 };
