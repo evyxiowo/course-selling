@@ -49,13 +49,15 @@ const courseSchema =  new Schema({
 })
 
 const purchaseSchema =  new Schema({
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
-    course: { type: Schema.Types.ObjectId, ref: 'Course' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    courseId: { type: Schema.Types.ObjectId, ref: 'Course' },
     purchaseDate: { type: Date, default: Date.now },
     purchaseStatus: { type: String, enum: ['pending', 'processing', 'completed', 'cancelled'], default: 'pending' }
 
  
 })
+
+//there is no course content yet, it will be added in future stages.
 
 const User = mongoose.model('User', userSchema)
 
