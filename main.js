@@ -1,14 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
 require('dotenv').config();  // Load environment variables from .env
 
+
 const app = express();
 const port = process.env.PORT || 3000;  // Use port from .env, default to 3000 if not set
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
